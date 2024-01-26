@@ -1,22 +1,22 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace std;
 
-int Size = 5;
+int const SIZE = 10;
 
 struct Player {
-	string Nickname;
-	int Level;
-	double Money;
-	string RegistrationDate;
+	string Nickname = "";
+	int Level = 0;
+	double Money = 0;
+	string RegistrationDate = "";
 }; 
 
-Player *players = new Player[Size];
+Player players[SIZE];
 
 string Field = "P..*.\n####.\n.*.*.\n.####\n....F\n";
 string temp_field = Field;
-
 
 
 // main functions
@@ -24,9 +24,12 @@ int searchByNickname(Player *p, string nick);
 void RegistrationDateSorting(Player* p);
 void moneySorting(Player* p);
 void alphabetSorting(Player* p, int st, int end);
+void printPlayers(Player* p);
 void Game(string field);
 void BonusGame(string field, int& choice);
 void menu();
+void addPlayer(Player* p);
+void deletePlayer(Player* p, int delindex);
 
 // support functions
 void DateConverter(int& day, int& month, int& year, string date);
@@ -46,16 +49,18 @@ void downMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
 void upMovement(string& field, int& position, bool& isWin);
 void upMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
 bool isDeadEnd(string field, int index, int dist, int count);
+int detectNextFreeElement(Player* p, int size);
 
 int main() {
-	//players[0] = { "ADC",1,34.56,"22.10.2022" };
-	//players[1] = { "ABC",2,3657.56,"23.10.2022" };
-	//players[2] = { "AAA",3,345.56,"19.11.2022" };
-	//players[3] = { "AAA",3,24345.56,"19.11.2022" };
-	//players[4] = { "AAA",3,23.9,"19.11.2022" };
+	players[0] = { "ADC",1,34.56,"22.10.2022" };
+	players[1] = { "ABC",2,3657.56,"23.10.2022" };
+	players[2] = { "AAA",3,345.56,"19.11.2022" };
+	players[3] = { "AAA",3,24345.56,"19.11.2022" };
+	players[4] = { "AAA",3,23.9,"19.11.2022" };
 	//moneySorting(players);
 	//cout << players[0].Money << ' ' << players[1].Money << ' ' << players[2].Money << ' ' << players[3].Money << ' ' << players[4].Money << ' ';
-	menu();
+	deletePlayer(players, 1);
+	printPlayers(players);
 }
 
 // main functions
@@ -69,8 +74,8 @@ int searchByNickname(Player *p, string nick) {
 	}
 }
 void moneySorting(Player* p) {
-	for (int i = 0; i < Size; i++) {
-		for (int j = 0; j < Size - 1; j++) {
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE - 1; j++) {
 			if (p[j].Money > p[j + 1].Money) {
 				swap(p[j], p[j + 1]);
 			}
@@ -78,7 +83,7 @@ void moneySorting(Player* p) {
 	}
 }
 void RegistrationDateSorting(Player* p) {
-	for (int i = 0; i < Size; i++) {
+	for (int i = 0; i < SIZE; i++) {
 		int day1, month1, year1, day2, month2, year2;
 		DateConverter(day1, month1, year1, p[i].RegistrationDate);
 		DateConverter(day2, month2, year2, p[i + 1].RegistrationDate);
@@ -98,7 +103,7 @@ void RegistrationDateSorting(Player* p) {
 	}
 }
 void alphabetSorting(Player* p, int st, int end) {
-	if (end == Size) {
+	if (end == SIZE) {
 		return;
 	}
 	findSimilarLevelIndex(p, st, end);
@@ -186,11 +191,50 @@ void menu() {
 		}
 	}
 }
+void addPlayer(Player* p) {
+	int temp_s = detectNextFreeElement(p, SIZE), tpos;
+	string f;
+	ifstream fin("AddPlayer.txt");
+	getline(fin, f);
+	tpos = f.find(':')+2;
+	p[temp_s].Nickname = f.substr(tpos, f.length() - tpos);
+	getline(fin, f);
+	tpos = f.find(':')+2;
+	p[temp_s].Level = stoi(f.substr(tpos, f.length() - tpos));
+	getline(fin, f);
+	tpos = f.find(':') + 2;
+	p[temp_s].Money = stod(f.substr(tpos, f.length() - tpos));
+	getline(fin, f);
+	tpos = f.find(':') + 2;
+	p[temp_s].RegistrationDate = f.substr(tpos, f.length() - tpos);
+	fin.close();
+}
+void printPlayers(Player* p) {
+	ofstream fout("Output.txt");
+	for (int i = 0; i < SIZE; i++) {
+		fout << "Player " << i + 1 << endl << "Nickname: " << p[i].Nickname << endl << "Level: " << p[i].Level << endl << "Money: " << p[i].Money << endl << "Registration date: " << p[i].RegistrationDate << "\n\n";
+	}
+	fout.close();
+}
+void deletePlayer(Player* p, int delindex) {
+	int index = detectNextFreeElement(p, SIZE);
+	for (int i = delindex; i < index-1; i++) {
+		swap(p[i], p[i + 1]);
+	}
+	index--;
+	Player temp_arr[SIZE];
+	for (int i = 0; i < index; i++) {
+		temp_arr[i] = p[i];
+	}
+	for (int i = 0; i < SIZE; i++) {
+		p[i] = temp_arr[i];
+	}
+}
 
 // support functions
 void levelSorting(Player* p) {
-	for (int i = 0; i < Size; i++) {
-		for (int j = 0; j < Size - 1; j++) {
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE - 1; j++) {
 			if (p[j].Level > p[j + 1].Level) {
 				swap(p[j], p[j + 1]);
 			}
@@ -519,6 +563,14 @@ bool isDeadEnd(string field, int index, int dist, int count) {
 	}
 	return true;
 }
-
+int detectNextFreeElement(Player* p, int size) {
+	size--;
+	while (true) {
+		if (p[size].Nickname != "") {
+			return size + 1;
+		}
+		size--;
+	}
+}
 
 

@@ -1,0 +1,60 @@
+Player 1
+Nickname: ADC
+Level: 1
+Money: 34.56
+Registration date: 22.10.2022
+
+Player 2
+Nickname: AAA
+Level: 3
+Money: 345.56
+Registration date: 19.11.2022
+
+Player 3
+Nickname: AAA
+Level: 3
+Money: 24345.6
+Registration date: 19.11.2022
+
+Player 4
+Nickname: AAA
+Level: 3
+Money: 23.9
+Registration date: 19.11.2022
+
+Player 5
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+
+Player 6
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+
+Player 7
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+
+Player 8
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+
+Player 9
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+
+Player 10
+Nickname: 
+Level: 0
+Money: 0
+Registration date: 
+

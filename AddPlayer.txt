@@ -1,0 +1,4 @@
+Nickname: test
+Level: 23
+Money: 45.435
+Registration date: 03.12.2000
