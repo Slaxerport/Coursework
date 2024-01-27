@@ -18,9 +18,10 @@ Player players[SIZE];
 string Field = "P..*.\n####.\n.*.*.\n.####\n....F\n";
 string temp_field = Field;
 
+ifstream fin("Output.txt");
 
 // main functions
-int searchByNickname(Player *p, string nick);
+int searchByNickname(Player *p);
 void RegistrationDateSorting(Player* p);
 void moneySorting(Player* p);
 void alphabetSorting(Player* p, int st, int end);
@@ -29,7 +30,10 @@ void Game(string field);
 void BonusGame(string field, int& choice);
 void menu();
 void addPlayer(Player* p);
-void deletePlayer(Player* p, int delindex);
+void deletePlayer(Player* p);
+void editPlayer(Player* p);
+void fillPlayer(Player* p, int index);
+void GameMenu(char& ch);
 
 // support functions
 void DateConverter(int& day, int& month, int& year, string date);
@@ -41,31 +45,29 @@ void winCheck(char s, bool& win);
 void winCheck(char s, bool& win, int& sc);
 int definePlayerPosition(string f);
 void leftMovement(string& field, int& position, bool& isWin);
-void leftMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
+void leftMovement(string& field, int& position, bool& isWin, int& sc, char& ch);
 void rightMovement(string& field, int& position, bool& isWin);
-void rightMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
+void rightMovement(string& field, int& position, bool& isWin, int& sc, char& ch);
 void downMovement(string& field, int& position, bool& isWin);
-void downMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
+void downMovement(string& field, int& position, bool& isWin, int& sc, char& ch);
 void upMovement(string& field, int& position, bool& isWin);
-void upMovement(string& field, int& position, bool& isWin, int& sc, int& ch);
+void upMovement(string& field, int& position, bool& isWin, int& sc, char& ch);
 bool isDeadEnd(string field, int index, int dist, int count);
 int detectNextFreeElement(Player* p, int size);
+void writeFromFileToArray(Player* p, int size);
+void getFile(string& field, string path);
 
 int main() {
-	players[0] = { "ADC",1,34.56,"22.10.2022" };
-	players[1] = { "ABC",2,3657.56,"23.10.2022" };
-	players[2] = { "AAA",3,345.56,"19.11.2022" };
-	players[3] = { "AAA",3,24345.56,"19.11.2022" };
-	players[4] = { "AAA",3,23.9,"19.11.2022" };
-	//moneySorting(players);
-	//cout << players[0].Money << ' ' << players[1].Money << ' ' << players[2].Money << ' ' << players[3].Money << ' ' << players[4].Money << ' ';
-	deletePlayer(players, 1);
-	printPlayers(players);
+	menu();
+
 }
 
 // main functions
-int searchByNickname(Player *p, string nick) {
+int searchByNickname(Player *p) {
+	string nick;
 	int i = 0;
+	cout << "Enter a nickname: ";
+	cin >> nick;
 	while(true){
 		if (nick == p[i].Nickname) {
 			return i;
@@ -119,7 +121,7 @@ void alphabetSorting(Player* p, int st, int end) {
 void Game(string field) {
 	int position = definePlayerPosition(field);
 	bool isWin = false;
-	while (!isWin){
+	while (!isWin) {
 		cout << field;
 		char move;
 		cin >> move;
@@ -140,10 +142,13 @@ void Game(string field) {
 		case 'S':
 			downMovement(field, position, isWin);
 			break;
+		default:
+			cout << "Enter a correct choice!\n";
+			break;
 		}
 	}
 }
-void BonusGame(string field, int& choice) {
+void BonusGame(string field, char& choice) {
 	int position = definePlayerPosition(field), star_count = 0;
 	bool isWin = false;
 	while (!isWin) {
@@ -167,26 +172,57 @@ void BonusGame(string field, int& choice) {
 		case 'S':
 			downMovement(field, position, isWin, star_count, choice);
 			break;
+		default:
+			cout << "Enter a correct choice!\n";
+			break;
 		}
 	}
 }
 void menu() {
 	string field = Field;
-	int ch = true;
-	while (ch) {
-		if (ch != 2) {
-			cout << "1 - Start game\n2 - Start bonus game\n0 - Exit\n";
+	char ch = true;
+	while (ch - '0') {
+		if (ch != '2') {
+			cout << "1 - Start game\n2 - Start bonus game\n3 - Print all players\n4 - Add a player\n5 - Edit a player\n6 - Delete a player\n7 - Search a player by nickname\n8 - Sort by money count\n9 - Sort by registration date\n10 - Sort by level and nickname\n0 - Exit\n";
 			cin >> ch;
 		}
 		switch (ch) {
-		case 1:
-			Game(field);
+		case '1':
+			GameMenu(ch);
 			break;
-		case 2:
+		case '2':
 			temp_field = Field;
 			BonusGame(temp_field, ch);
 			break;
-		case 0:
+		case '3':
+			printPlayers(players);
+			break;
+		case '4':
+			fillPlayer(players, detectNextFreeElement(players, SIZE));
+			break;
+		case '5':
+			editPlayer(players);
+			break;
+		case '6':
+			deletePlayer(players);
+			break;
+		case '7':
+			searchByNickname(players);
+			break;
+		case '8':
+			moneySorting(players);
+			break;
+		case '9':
+			RegistrationDateSorting(players);
+			break;
+		case '10':
+			levelSorting(players);
+			alphabetSorting(players, 0, SIZE);
+			break;
+		case '0':
+			break;
+		default:
+			cout << "Enter a correct choice!\n";
 			break;
 		}
 	}
@@ -194,20 +230,32 @@ void menu() {
 void addPlayer(Player* p) {
 	int temp_s = detectNextFreeElement(p, SIZE), tpos;
 	string f;
-	ifstream fin("AddPlayer.txt");
+	getline(fin, f); //
+	getline(fin, f); // skip first two lines
 	getline(fin, f);
+	if (f.find(':') == std::string::npos) {
+		return;
+	}
 	tpos = f.find(':')+2;
 	p[temp_s].Nickname = f.substr(tpos, f.length() - tpos);
 	getline(fin, f);
+	if (f.find(':') == std::string::npos) {
+		return;
+	}
 	tpos = f.find(':')+2;
 	p[temp_s].Level = stoi(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
+	if (f.find(':') == std::string::npos) {
+		return;
+	}
 	tpos = f.find(':') + 2;
 	p[temp_s].Money = stod(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
+	if (f.find(':') == std::string::npos) {
+		return;
+	}
 	tpos = f.find(':') + 2;
 	p[temp_s].RegistrationDate = f.substr(tpos, f.length() - tpos);
-	fin.close();
 }
 void printPlayers(Player* p) {
 	ofstream fout("Output.txt");
@@ -216,8 +264,10 @@ void printPlayers(Player* p) {
 	}
 	fout.close();
 }
-void deletePlayer(Player* p, int delindex) {
-	int index = detectNextFreeElement(p, SIZE);
+void deletePlayer(Player* p) {
+	int index = detectNextFreeElement(p, SIZE), delindex;
+	cout << "Enter the index of the player: ";
+	cin >> delindex;
 	for (int i = delindex; i < index-1; i++) {
 		swap(p[i], p[i + 1]);
 	}
@@ -230,6 +280,62 @@ void deletePlayer(Player* p, int delindex) {
 		p[i] = temp_arr[i];
 	}
 }
+void editPlayer(Player* p) {
+	int ind;
+	cout << "Enter the index of the player: ";
+	cin >> ind;
+	fillPlayer(p, ind);
+}
+void fillPlayer(Player* p, int index) {
+	cout << "Nickname: ";
+	cin >> p[index].Nickname;
+	cout << "Level: ";
+	cin >> p[index].Level;
+	cout << "Money: ";
+	cin >> p[index].Money;
+	cout << "Registration date: ";
+	cin >> p[index].RegistrationDate;
+}
+void GameMenu(char& ch) {
+	while (ch-'0') {
+		string f;
+		cout << "1 - Level 1\n2 - Level 2\n3 - Level 3\n4 - Level 4\n5 - Level 5\n0 - Exit\n";
+		cin >> ch;
+		switch (ch) {
+		case '1':
+			getFile(f, "Level1.txt");
+			Game(f);
+			break;
+
+		case '2':
+			getFile(f, "Level2.txt");
+			Game(f);
+			break;
+
+		case '3':
+			getFile(f, "Level3.txt");
+			Game(f);
+			break;
+
+		case '4':
+			getFile(f, "Level4.txt");
+			Game(f);
+			break;
+
+		case '5':
+			getFile(f, "Level5.txt");
+			Game(f);
+			break;
+		case '0':
+			break;
+		default:
+			cout << "Enter a correct choice!\n";
+			break;
+		}
+	}
+	ch++;
+}
+
 
 // support functions
 void levelSorting(Player* p) {
@@ -291,7 +397,9 @@ void winCheck(char s, bool& win) {
 		win = true;
 		cout << "WIN!\n";
 	}
-	win = false;
+	else {
+		win = false;
+	}
 	return;
 }
 void winCheck(char s, bool& win, int& sc) {
@@ -318,6 +426,9 @@ void leftMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 		return;
 	}
+	if (isWin) {
+		return;
+	}
 	if (field[position - 1] != '#' && field[position - 1] != '\n' && field[position - 1] != ' ') {
 		swap(field[position], field[position - 1]);
 		position--;
@@ -326,7 +437,7 @@ void leftMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 	}
 }
-void leftMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
+void leftMovement(string& field, int& position, bool& isWin, int& sc, char& ch) {
 	if (position != 0) {
 		winCheck(field[position - 1], isWin);
 	}
@@ -336,7 +447,7 @@ void leftMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
 	}
 
 	if (isWin) {
-		ch = 1;
+		ch = '1';
 		return;
 	}
 	if (field[position - 1] == 'F' && sc < 3) {
@@ -348,11 +459,11 @@ void leftMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
 		cin >> c;
 		if (c == 'Y') {
 			isWin = true;
-			ch = 2;
+			ch = '2';
 		}
 		else {
 			isWin = true;
-			ch = 1;
+			ch = '1';
 		}
 		return;
 	}
@@ -373,6 +484,9 @@ void leftMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
 }
 void rightMovement(string& field, int& position, bool& isWin) {
 	winCheck(field[position + 1], isWin);
+	if (isWin) {
+		return;
+	}
 	if (field[position + 1] != '#' && field[position + 1] != '\n' && field[position + 1] != ' ') {
 		swap(field[position], field[position + 1]);
 		position++;
@@ -381,10 +495,10 @@ void rightMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 	}
 }
-void rightMovement(string& field, int& position, bool& isWin, int& sc, int& ch)  {
+void rightMovement(string& field, int& position, bool& isWin, int& sc, char& ch)  {
 	winCheck(field[position + 1], isWin, sc);
 	if (isWin) {
-		ch = 1;
+		ch = '1';
 		return;
 	}
 	if (field[position + 1] == 'F' && sc < 3) {
@@ -395,10 +509,10 @@ void rightMovement(string& field, int& position, bool& isWin, int& sc, int& ch) 
 		char c;
 		cin >> c;
 		if (c == 'Y') {
-			ch = 2;
+			ch = '2';
 		}
 		else {
-			ch = 1;
+			ch = '1';
 		}
 		isWin = true;
 		return;
@@ -425,6 +539,9 @@ void downMovement(string& field, int& position, bool& isWin) {
 		return;
 	}
 	winCheck(field[position + distance], isWin);
+	if (isWin) {
+		return;
+	}
 	if (field[position + distance] != '#' && field[position + distance] != '\n' && position + distance <= field.length()) {
 		swap(field[position], field[position + distance]);
 		position += distance;
@@ -433,7 +550,7 @@ void downMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 	}
 }
-void downMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
+void downMovement(string& field, int& position, bool& isWin, int& sc, char& ch) {
 	int distance = distanceToSymbol(field, position);
 	if (position + distance >= field.length()) {
 		cout << "Wrong move!\n";
@@ -448,17 +565,17 @@ void downMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
 		cin >> c;
 		if (c == 'Y') {
 			isWin = true;
-			ch = 2;
+			ch = '2';
 		}
 		else {
 			isWin = true;
-			ch = 1;
+			ch = '1';
 		}
 		return;
 	}
 	winCheck(field[position + distance], isWin, sc);
 	if (isWin) {
-		ch = 1;
+		ch = '1';
 		return;
 	}
 	else if (field[position + distance] == 'F' && sc < 3) {
@@ -487,6 +604,9 @@ void upMovement(string& field, int& position, bool& isWin) {
 		return;
 	}
 	winCheck(field[position - distance], isWin);
+	if (isWin) {
+		return;
+	}
 	if (field[position - distance] != '#' && field[position - distance] != '\n') {
 		swap(field[position], field[position - distance]);
 		position -= distance;
@@ -495,7 +615,7 @@ void upMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 	}
 }
-void upMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
+void upMovement(string& field, int& position, bool& isWin, int& sc, char& ch) {
 	int distance = distanceToSymbol(field, position);
 	if (position - distance < 0 || field[position - distance] == ' ') {
 		cout << "Wrong move!\n";
@@ -510,17 +630,17 @@ void upMovement(string& field, int& position, bool& isWin, int& sc, int& ch) {
 		cin >> c;
 		if (c == 'Y') {
 			isWin = true;
-			ch = 2;
+			ch = '2';
 		}
 		else {
 			isWin = true;
-			ch = 1;
+			ch = '1';
 		}
 		return;
 	}
 	winCheck(field[position - distance], isWin, sc);
 	if (isWin) {
-		ch = 1;
+		ch = '1';
 		return;
 	}
 	else if (field[position - distance] == 'F' && sc < 3) {
@@ -572,5 +692,19 @@ int detectNextFreeElement(Player* p, int size) {
 		size--;
 	}
 }
-
-
+void writeFromFileToArray(Player* p, int size) {
+	for (int i = 0; i < size; i++) {
+		addPlayer(p);
+	}
+	fin.close();
+}
+void getFile(string& field, string path) {
+	string temp;
+	ifstream fin(path);
+	while (true) {
+		getline(fin, temp);
+		if (temp == "") return;
+		field += temp;
+		field += '\n';
+	}
+}
