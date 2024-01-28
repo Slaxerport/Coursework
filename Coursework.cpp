@@ -11,7 +11,7 @@ struct Player {
 	int Level = 0;
 	double Money = 0;
 	string RegistrationDate = "";
-}; 
+};
 
 Player players[SIZE];
 
@@ -21,7 +21,7 @@ string temp_field = Field;
 ifstream fin("Output.txt");
 
 // main functions
-int searchByNickname(Player *p);
+int searchByNickname(Player* p);
 void RegistrationDateSorting(Player* p);
 void moneySorting(Player* p);
 void alphabetSorting(Player* p, int st, int end);
@@ -34,6 +34,7 @@ void deletePlayer(Player* p);
 void editPlayer(Player* p);
 void fillPlayer(Player* p, int index);
 void GameMenu(char& ch);
+void consolePrint(Player* p);
 
 // support functions
 void DateConverter(int& day, int& month, int& year, string date);
@@ -63,17 +64,16 @@ int main() {
 }
 
 // main functions
-int searchByNickname(Player *p) {
+int searchByNickname(Player* p) {
 	string nick;
-	int i = 0;
 	cout << "Enter a nickname: ";
 	cin >> nick;
-	while(true){
+	for (int i = 0; i < SIZE; i++) {
 		if (nick == p[i].Nickname) {
 			return i;
 		}
-		i++;
 	}
+	return -1;
 }
 void moneySorting(Player* p) {
 	for (int i = 0; i < SIZE; i++) {
@@ -179,6 +179,7 @@ void BonusGame(string field, char& choice) {
 	}
 }
 void menu() {
+	int number;
 	string field = Field;
 	char ch = true;
 	while (ch - '0') {
@@ -195,7 +196,7 @@ void menu() {
 			BonusGame(temp_field, ch);
 			break;
 		case '3':
-			printPlayers(players);
+			consolePrint(players);
 			break;
 		case '4':
 			fillPlayer(players, detectNextFreeElement(players, SIZE));
@@ -207,7 +208,13 @@ void menu() {
 			deletePlayer(players);
 			break;
 		case '7':
-			searchByNickname(players);
+			number = searchByNickname(players);
+			if (number == -1) {
+				cout << "There are no players with that nickname!\n";
+			}
+			else {
+				cout << number << endl;
+			}
 			break;
 		case '8':
 			moneySorting(players);
@@ -236,13 +243,13 @@ void addPlayer(Player* p) {
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
-	tpos = f.find(':')+2;
+	tpos = f.find(':') + 2;
 	p[temp_s].Nickname = f.substr(tpos, f.length() - tpos);
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
-	tpos = f.find(':')+2;
+	tpos = f.find(':') + 2;
 	p[temp_s].Level = stoi(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
@@ -268,7 +275,7 @@ void deletePlayer(Player* p) {
 	int index = detectNextFreeElement(p, SIZE), delindex;
 	cout << "Enter the index of the player: ";
 	cin >> delindex;
-	for (int i = delindex; i < index-1; i++) {
+	for (int i = delindex; i < index - 1; i++) {
 		swap(p[i], p[i + 1]);
 	}
 	index--;
@@ -297,7 +304,7 @@ void fillPlayer(Player* p, int index) {
 	cin >> p[index].RegistrationDate;
 }
 void GameMenu(char& ch) {
-	while (ch-'0') {
+	while (ch - '0') {
 		string f;
 		cout << "1 - Level 1\n2 - Level 2\n3 - Level 3\n4 - Level 4\n5 - Level 5\n0 - Exit\n";
 		cin >> ch;
@@ -335,6 +342,16 @@ void GameMenu(char& ch) {
 	}
 	ch++;
 }
+void consolePrint(Player* p) {
+	for (int i = 1; i <= detectNextFreeElement(p, SIZE); i++) {
+		cout << "Player " << i << endl;
+		cout << "Nickname: " << p[i-1].Nickname << endl;
+		cout << "Level: " << p[i-1].Level << endl;
+		cout << "Money: " << p[i-1].Money << endl;
+		cout << "Registration date: " << p[i-1].RegistrationDate << endl;
+		cout << endl;
+	}
+}
 
 
 // support functions
@@ -350,16 +367,16 @@ void levelSorting(Player* p) {
 void DateConverter(int& day, int& month, int& year, string date) {
 	int sp = date.find('.', 0);
 	day = stoi(date.substr(0, sp));
-	month = stoi(date.substr(sp+1, date.find('.', sp + 1) - sp - 1));
-	sp = date.find('.', sp+1);
-	year = stoi(date.substr(sp+1, date.length()-sp-1));
+	month = stoi(date.substr(sp + 1, date.find('.', sp + 1) - sp - 1));
+	sp = date.find('.', sp + 1);
+	year = stoi(date.substr(sp + 1, date.length() - sp - 1));
 }
 void findSimilarLevelIndex(Player* p, int& start, int& end) {
 	int l = p[start].Level, i = start;
 	while (p[i].Level == l) {
 		i++;
 	}
-	end = i-1;
+	end = i - 1;
 }
 void checkOnLetter(string& a, string& b) {
 	int m = min(a.length(), b.length());
@@ -403,7 +420,7 @@ void winCheck(char s, bool& win) {
 	return;
 }
 void winCheck(char s, bool& win, int& sc) {
-	if (s == 'F' && sc==3) {
+	if (s == 'F' && sc == 3) {
 		win = true;
 		cout << "WIN!\n";
 	}
@@ -495,7 +512,7 @@ void rightMovement(string& field, int& position, bool& isWin) {
 		cout << "Wrong move!\n";
 	}
 }
-void rightMovement(string& field, int& position, bool& isWin, int& sc, char& ch)  {
+void rightMovement(string& field, int& position, bool& isWin, int& sc, char& ch) {
 	winCheck(field[position + 1], isWin, sc);
 	if (isWin) {
 		ch = '1';
