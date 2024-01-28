@@ -227,6 +227,7 @@ void menu() {
 			alphabetSorting(players, 0, SIZE);
 			break;
 		case '0':
+			printPlayers(players);
 			break;
 		default:
 			cout << "Enter a correct choice!\n";
