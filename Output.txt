@@ -1,0 +1,24 @@
+
+Player 1
+Nickname: fd
+Level: 43
+Money: 2
+Registration date: 53.4.8
+
+Player 2
+Nickname: bg
+Level: 54
+Money: 34
+Registration date: 5.57.6587
+
+Player 3
+Nickname: p5er
+Level: 5
+Money: 45
+Registration date: 45
+
+Player 4
+Nickname: test
+Level: 34
+Money: 67
+Registration date: 56.76.43
