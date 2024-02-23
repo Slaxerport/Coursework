@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <conio.h>
 
 using namespace std;
 
-int const SIZE = 10;
+int Size = 10;
 
 struct Player {
 	string Nickname = "";
@@ -13,12 +14,13 @@ struct Player {
 	string RegistrationDate = "";
 };
 
-Player players[SIZE];
+Player *players = new Player[Size];
 
 string Field = "P..*.\n####.\n.*.*.\n.####\n....F\n";
 string temp_field = Field;
 
 ifstream fin("Output.txt");
+
 
 // main functions
 int searchByNickname(Player* p);
@@ -40,7 +42,6 @@ void consolePrint(Player* p);
 void DateConverter(int& day, int& month, int& year, string date);
 void findSimilarLevelIndex(Player* p, int& start, int& end);
 void levelSorting(Player* p);
-void checkOnLetter(string& a, string& b);
 int distanceToSymbol(string s, int pos);
 void winCheck(char s, bool& win);
 void winCheck(char s, bool& win, int& sc);
@@ -68,7 +69,7 @@ int searchByNickname(Player* p) {
 	string nick;
 	cout << "Enter a nickname: ";
 	cin >> nick;
-	for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < Size; i++) {
 		if (nick == p[i].Nickname) {
 			return i;
 		}
@@ -76,8 +77,8 @@ int searchByNickname(Player* p) {
 	return -1;
 }
 void moneySorting(Player* p) {
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE - 1; j++) {
+	for (int i = 0; i < Size; i++) {
+		for (int j = 0; j < Size - 1; j++) {
 			if (p[j].Money > p[j + 1].Money) {
 				swap(p[j], p[j + 1]);
 			}
@@ -85,7 +86,7 @@ void moneySorting(Player* p) {
 	}
 }
 void RegistrationDateSorting(Player* p) {
-	for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < Size-1; i++) {
 		int day1, month1, year1, day2, month2, year2;
 		DateConverter(day1, month1, year1, p[i].RegistrationDate);
 		DateConverter(day2, month2, year2, p[i + 1].RegistrationDate);
@@ -105,14 +106,16 @@ void RegistrationDateSorting(Player* p) {
 	}
 }
 void alphabetSorting(Player* p, int st, int end) {
-	if (end == SIZE) {
+	if (end == Size) {
 		return;
 	}
 	findSimilarLevelIndex(p, st, end);
 	if (end - st) {
 		for (int i = st; i < end + 1; i++) {
-			for (int j = 0; j < end; j++) {
-				checkOnLetter(p[j].Nickname, p[j + 1].Nickname);
+			for (int j = i; j < end; j++) {
+				if (p[j].Nickname > p[j + 1].Nickname); {
+					swap(p[j], p[j + 1]);
+				}
 			}
 		}
 	}
@@ -120,73 +123,98 @@ void alphabetSorting(Player* p, int st, int end) {
 }
 void Game(string field) {
 	int position = definePlayerPosition(field);
-	bool isWin = false;
+	bool isWin = false, iskbhit = true;
 	while (!isWin) {
-		cout << field;
-		char move;
-		cin >> move;
-		switch (move) {
-		case 'a':
-		case 'A':
-			leftMovement(field, position, isWin);
-			break;
-		case 'd':
-		case 'D':
-			rightMovement(field, position, isWin);
-			break;
-		case 'w':
-		case 'W':
-			upMovement(field, position, isWin);
-			break;
-		case 's':
-		case 'S':
-			downMovement(field, position, isWin);
-			break;
-		default:
-			cout << "Enter a correct choice!\n";
-			break;
+		if (iskbhit) {
+			system("cls");
+			cout << field;
+		}
+		if (_kbhit()) {
+			iskbhit = true;
+			switch (_getch()) {
+			case 'a':
+			case 'A':
+				leftMovement(field, position, isWin);
+				break;
+			case 'd':
+			case 'D':
+				rightMovement(field, position, isWin);
+				break;
+			case 'w':
+			case 'W':
+				upMovement(field, position, isWin);
+				break;
+			case 's':
+			case 'S':
+				downMovement(field, position, isWin);
+				break;
+			default:
+				cout << "Enter a correct choice!\n";
+				break;
+			}
+		}
+		else {
+			iskbhit = false;
 		}
 	}
 }
 void BonusGame(string field, char& choice) {
 	int position = definePlayerPosition(field), star_count = 0;
-	bool isWin = false;
+	bool isWin = false, iskbhit = true;
 	while (!isWin) {
-		cout << field;
-		char move;
-		cin >> move;
-		switch (move) {
-		case 'a':
-		case 'A':
-			leftMovement(field, position, isWin, star_count, choice);
-			break;
-		case 'd':
-		case 'D':
-			rightMovement(field, position, isWin, star_count, choice);
-			break;
-		case 'w':
-		case 'W':
-			upMovement(field, position, isWin, star_count, choice);
-			break;
-		case 's':
-		case 'S':
-			downMovement(field, position, isWin, star_count, choice);
-			break;
-		default:
-			cout << "Enter a correct choice!\n";
-			break;
+		if (iskbhit) {
+			system("cls");
+			cout << field;
+		}
+		if (_kbhit()) {
+			iskbhit = true;
+			switch (_getch()) {
+			case 'a':
+			case 'A':
+				leftMovement(field, position, isWin, star_count, choice);
+				break;
+			case 'd':
+			case 'D':
+				rightMovement(field, position, isWin, star_count, choice);
+				break;
+			case 'w':
+			case 'W':
+				upMovement(field, position, isWin, star_count, choice);
+				break;
+			case 's':
+			case 'S':
+				downMovement(field, position, isWin, star_count, choice);
+				break;
+			default:
+				cout << "Enter a correct choice!\n";
+				break;
+			}
+		}
+		else {
+			iskbhit = false;
 		}
 	}
 }
 void menu() {
+	Size = detectNextFreeElement(players, Size);
+	if (Size == 0) {
+		Size++;
+	}
+	while (!fin.eof()) {
+		addPlayer(players);
+		Size++;
+	}
+	Size--;
 	int number;
 	string field = Field;
 	char ch = true;
 	while (ch - '0') {
+		system("cls");
 		if (ch != '2') {
-			cout << "1 - Start game\n2 - Start bonus game\n3 - Print all players\n4 - Add a player\n5 - Edit a player\n6 - Delete a player\n7 - Search a player by nickname\n8 - Sort by money count\n9 - Sort by registration date\n10 - Sort by level and nickname\n0 - Exit\n";
+			cout << "1 - Start game\n2 - Start bonus game\n3 - Print all players\n4 - Add a player\n5 - Edit a player\n6 - Delete a player\n7 - Search a player by nickname\n8 - Sort by money count\n9 - Sort by registration date\ns - Sort by level and nickname\n0 - Exit\n";
 			cin >> ch;
 		}
+		system("cls");
 		switch (ch) {
 		case '1':
 			GameMenu(ch);
@@ -197,9 +225,10 @@ void menu() {
 			break;
 		case '3':
 			consolePrint(players);
+			system("pause");
 			break;
 		case '4':
-			fillPlayer(players, detectNextFreeElement(players, SIZE));
+			fillPlayer(players, detectNextFreeElement(players, Size));
 			break;
 		case '5':
 			editPlayer(players);
@@ -215,6 +244,7 @@ void menu() {
 			else {
 				cout << number << endl;
 			}
+			system("pause");
 			break;
 		case '8':
 			moneySorting(players);
@@ -222,9 +252,9 @@ void menu() {
 		case '9':
 			RegistrationDateSorting(players);
 			break;
-		case '10':
+		case 's':
 			levelSorting(players);
-			alphabetSorting(players, 0, SIZE);
+			alphabetSorting(players, 0, 0);
 			break;
 		case '0':
 			printPlayers(players);
@@ -236,7 +266,7 @@ void menu() {
 	}
 }
 void addPlayer(Player* p) {
-	int temp_s = detectNextFreeElement(p, SIZE), tpos;
+	int tpos;
 	string f;
 	getline(fin, f); //
 	getline(fin, f); // skip first two lines
@@ -245,46 +275,54 @@ void addPlayer(Player* p) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[temp_s].Nickname = f.substr(tpos, f.length() - tpos);
+	p[Size-1].Nickname = f.substr(tpos, f.length() - tpos);
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[temp_s].Level = stoi(f.substr(tpos, f.length() - tpos));
+	p[Size-1].Level = stoi(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[temp_s].Money = stod(f.substr(tpos, f.length() - tpos));
+	p[Size-1].Money = stod(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[temp_s].RegistrationDate = f.substr(tpos, f.length() - tpos);
+	p[Size-1].RegistrationDate = f.substr(tpos, f.length() - tpos);
 }
 void printPlayers(Player* p) {
 	ofstream fout("Output.txt");
-	for (int i = 0; i < SIZE; i++) {
-		fout << "Player " << i + 1 << endl << "Nickname: " << p[i].Nickname << endl << "Level: " << p[i].Level << endl << "Money: " << p[i].Money << endl << "Registration date: " << p[i].RegistrationDate << "\n\n";
+	for (int i = 0; i < Size; i++) {
+		fout << endl << "Player " << i + 1 << endl << "Nickname: " << p[i].Nickname << endl << "Level: " << p[i].Level << endl << "Money: " << p[i].Money << endl << "Registration date: " << p[i].RegistrationDate;
+		if (i != Size - 1) {
+			fout << endl;
+		}
 	}
 	fout.close();
 }
 void deletePlayer(Player* p) {
-	int index = detectNextFreeElement(p, SIZE), delindex;
+	int delindex;
 	cout << "Enter the index of the player: ";
 	cin >> delindex;
-	for (int i = delindex; i < index - 1; i++) {
+	if (delindex >= Size) {
+		cout << "There are no players with that index!" << endl;
+		system("pause");
+		return;
+	}
+	for (int i = delindex; i < Size - 1; i++) {
 		swap(p[i], p[i + 1]);
 	}
-	index--;
-	Player temp_arr[SIZE];
-	for (int i = 0; i < index; i++) {
+	Size--;
+	Player* temp_arr = new Player[Size];
+	for (int i = 0; i < Size; i++) {
 		temp_arr[i] = p[i];
 	}
-	for (int i = 0; i < SIZE; i++) {
+	for (int i = 0; i < Size; i++) {
 		p[i] = temp_arr[i];
 	}
 }
@@ -303,6 +341,7 @@ void fillPlayer(Player* p, int index) {
 	cin >> p[index].Money;
 	cout << "Registration date: ";
 	cin >> p[index].RegistrationDate;
+	Size++;
 }
 void GameMenu(char& ch) {
 	while (ch - '0') {
@@ -344,7 +383,7 @@ void GameMenu(char& ch) {
 	ch++;
 }
 void consolePrint(Player* p) {
-	for (int i = 1; i <= detectNextFreeElement(p, SIZE); i++) {
+	for (int i = 1; i <= detectNextFreeElement(p, Size); i++) {
 		cout << "Player " << i << endl;
 		cout << "Nickname: " << p[i-1].Nickname << endl;
 		cout << "Level: " << p[i-1].Level << endl;
@@ -357,8 +396,8 @@ void consolePrint(Player* p) {
 
 // support functions
 void levelSorting(Player* p) {
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE - 1; j++) {
+	for (int i = 0; i < Size; i++) {
+		for (int j = 0; j < Size - 1; j++) {
 			if (p[j].Level > p[j + 1].Level) {
 				swap(p[j], p[j + 1]);
 			}
@@ -378,25 +417,6 @@ void findSimilarLevelIndex(Player* p, int& start, int& end) {
 		i++;
 	}
 	end = i - 1;
-}
-void checkOnLetter(string& a, string& b) {
-	int m = min(a.length(), b.length());
-	for (int i = 0; i < m; i++) {
-		if (toupper(a[i]) > toupper(b[i])) {
-			swap(a, b);
-			return;
-		}
-		if (toupper(a[i]) < toupper(b[i])) {
-			return;
-		}
-	}
-	if (m == a.length()) {
-		swap(a, b);
-		return;
-	}
-	else {
-		return;
-	}
 }
 int distanceToSymbol(string s, int pos) {
 	int strdist = 0, temp_pos = pos;
@@ -704,11 +724,15 @@ bool isDeadEnd(string field, int index, int dist, int count) {
 int detectNextFreeElement(Player* p, int size) {
 	size--;
 	while (true) {
+		if (size == -1) {
+			return 0;
+		}
 		if (p[size].Nickname != "") {
 			return size + 1;
 		}
 		size--;
 	}
+
 }
 void writeFromFileToArray(Player* p, int size) {
 	for (int i = 0; i < size; i++) {
@@ -719,10 +743,11 @@ void writeFromFileToArray(Player* p, int size) {
 void getFile(string& field, string path) {
 	string temp;
 	ifstream fin(path);
-	while (true) {
+	while (!fin.eof()) {
 		getline(fin, temp);
-		if (temp == "") return;
 		field += temp;
 		field += '\n';
 	}
+	fin.close();
 }
+

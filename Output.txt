@@ -1,60 +1,42 @@
+
 Player 1
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: rst
+Level: 1
+Money: 67
+Registration date: 56.76.43
 
 Player 2
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: p5er
+Level: 5
+Money: 45
+Registration date: 45
 
 Player 3
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: test
+Level: 5
+Money: 67
+Registration date: 56.76.43
 
 Player 4
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: gftr64
+Level: 43
+Money: 34
+Registration date: 5.57.6587
 
 Player 5
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: fd
+Level: 43
+Money: 2
+Registration date: 53.4.8
 
 Player 6
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
+Nickname: rst
+Level: 43
+Money: 67
+Registration date: 56.76.43
 
 Player 7
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
-
-Player 8
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
-
-Player 9
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
-
-Player 10
-Nickname: 
-Level: 0
-Money: 0
-Registration date: 
-
+Nickname: rst
+Level: 8776
+Money: 67
+Registration date: 56.76.43
