@@ -14,9 +14,9 @@ struct Player {
 	string RegistrationDate = "";
 };
 
-Player *players = new Player[Size];
+Player* players = new Player[Size];
 
-string Field = "P..*.\n####.\n.*.*.\n.####\n....F\n";
+string Field = "P*..\n.##.\n.#.*\n..##\n#..F\n";
 string temp_field = Field;
 
 ifstream fin("Output.txt");
@@ -29,7 +29,7 @@ void moneySorting(Player* p);
 void alphabetSorting(Player* p, int st, int end);
 void printPlayers(Player* p);
 void Game(string field);
-void BonusGame(string field, int& choice);
+void BonusGame(string field, char& choice);
 void menu();
 void addPlayer(Player* p);
 void deletePlayer(Player* p);
@@ -61,7 +61,6 @@ void getFile(string& field, string path);
 
 int main() {
 	menu();
-
 }
 
 // main functions
@@ -86,7 +85,7 @@ void moneySorting(Player* p) {
 	}
 }
 void RegistrationDateSorting(Player* p) {
-	for (int i = 0; i < Size-1; i++) {
+	for (int i = 0; i < Size - 1; i++) {
 		int day1, month1, year1, day2, month2, year2;
 		DateConverter(day1, month1, year1, p[i].RegistrationDate);
 		DateConverter(day2, month2, year2, p[i + 1].RegistrationDate);
@@ -275,25 +274,25 @@ void addPlayer(Player* p) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[Size-1].Nickname = f.substr(tpos, f.length() - tpos);
+	p[Size - 1].Nickname = f.substr(tpos, f.length() - tpos);
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[Size-1].Level = stoi(f.substr(tpos, f.length() - tpos));
+	p[Size - 1].Level = stoi(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[Size-1].Money = stod(f.substr(tpos, f.length() - tpos));
+	p[Size - 1].Money = stod(f.substr(tpos, f.length() - tpos));
 	getline(fin, f);
 	if (f.find(':') == std::string::npos) {
 		return;
 	}
 	tpos = f.find(':') + 2;
-	p[Size-1].RegistrationDate = f.substr(tpos, f.length() - tpos);
+	p[Size - 1].RegistrationDate = f.substr(tpos, f.length() - tpos);
 }
 void printPlayers(Player* p) {
 	ofstream fout("Output.txt");
@@ -331,6 +330,7 @@ void editPlayer(Player* p) {
 	cout << "Enter the index of the player: ";
 	cin >> ind;
 	fillPlayer(p, ind);
+	Size--;
 }
 void fillPlayer(Player* p, int index) {
 	cout << "Nickname: ";
@@ -385,10 +385,10 @@ void GameMenu(char& ch) {
 void consolePrint(Player* p) {
 	for (int i = 1; i <= detectNextFreeElement(p, Size); i++) {
 		cout << "Player " << i << endl;
-		cout << "Nickname: " << p[i-1].Nickname << endl;
-		cout << "Level: " << p[i-1].Level << endl;
-		cout << "Money: " << p[i-1].Money << endl;
-		cout << "Registration date: " << p[i-1].RegistrationDate << endl;
+		cout << "Nickname: " << p[i - 1].Nickname << endl;
+		cout << "Level: " << p[i - 1].Level << endl;
+		cout << "Money: " << p[i - 1].Money << endl;
+		cout << "Registration date: " << p[i - 1].RegistrationDate << endl;
 		cout << endl;
 	}
 }
@@ -750,4 +750,3 @@ void getFile(string& field, string path) {
 	}
 	fin.close();
 }
-
